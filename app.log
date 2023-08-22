@@ -5505,3 +5505,43 @@ Using generated security password: 4e1eae68-3267-4e5d-909b-7ea836343988
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
 2023-08-21T23:18:09.950-04:00  INFO 56930 --- [main] c.s.ourhomedev.OurHomeDevApplication     : Started OurHomeDevApplication in 1.951 seconds (process running for 2.307)
+2023-08-22T19:09:53.169-04:00  INFO 65151 --- [main] c.s.o.OurHomeDevApplicationTests         : Starting OurHomeDevApplicationTests using Java 20.0.1 with PID 65151 (started by steffanielopez in /Users/steffanielopez/ws/our-home-dev)
+2023-08-22T19:09:53.172-04:00 DEBUG 65151 --- [main] c.s.o.OurHomeDevApplicationTests         : Running with Spring Boot v3.1.2, Spring v6.0.11
+2023-08-22T19:09:53.175-04:00  INFO 65151 --- [main] c.s.o.OurHomeDevApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2023-08-22T19:09:56.486-04:00  WARN 65151 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 4ab8407a-bbd7-4bb6-844e-835157c50f7f
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2023-08-22T19:09:56.937-04:00  INFO 65151 --- [main] c.s.o.OurHomeDevApplicationTests         : Started OurHomeDevApplicationTests in 4.745 seconds (process running for 11.02)
+2023-08-22T19:14:50.529-04:00  INFO 65225 --- [main] c.s.o.OurHomeDevApplicationTests         : Starting OurHomeDevApplicationTests using Java 20.0.1 with PID 65225 (started by steffanielopez in /Users/steffanielopez/ws/our-home-dev)
+2023-08-22T19:14:50.535-04:00 DEBUG 65225 --- [main] c.s.o.OurHomeDevApplicationTests         : Running with Spring Boot v3.1.2, Spring v6.0.11
+2023-08-22T19:14:50.537-04:00  INFO 65225 --- [main] c.s.o.OurHomeDevApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2023-08-22T19:14:58.254-04:00  WARN 65225 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 02cd0762-03b5-42ea-9181-da80d533b549
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2023-08-22T19:14:59.050-04:00  INFO 65225 --- [main] c.s.o.OurHomeDevApplicationTests         : Started OurHomeDevApplicationTests in 9.884 seconds (process running for 20.096)
+2023-08-22T19:15:35.704-04:00  INFO 65267 --- [main] c.s.ourhomedev.OurHomeDevApplication     : Starting OurHomeDevApplication using Java 20.0.1 with PID 65267 (/Users/steffanielopez/ws/our-home-dev/target/classes started by steffanielopez in /Users/steffanielopez/ws/our-home-dev)
+2023-08-22T19:15:35.710-04:00 DEBUG 65267 --- [main] c.s.ourhomedev.OurHomeDevApplication     : Running with Spring Boot v3.1.2, Spring v6.0.11
+2023-08-22T19:15:35.713-04:00  INFO 65267 --- [main] c.s.ourhomedev.OurHomeDevApplication     : No active profile set, falling back to 1 default profile: "default"
+2023-08-22T19:15:41.224-04:00  WARN 65267 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 8a21c201-bb91-448a-91bb-719d2b3eb9f2
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2023-08-22T19:15:41.754-04:00  INFO 65267 --- [main] c.s.ourhomedev.OurHomeDevApplication     : Started OurHomeDevApplication in 7.456 seconds (process running for 9.311)
+2023-08-22T19:21:06.459-04:00  INFO 65517 --- [main] c.s.o.OurHomeDevApplicationTests         : Starting OurHomeDevApplicationTests using Java 20.0.1 with PID 65517 (started by steffanielopez in /Users/steffanielopez/ws/our-home-dev)
+2023-08-22T19:21:06.463-04:00 DEBUG 65517 --- [main] c.s.o.OurHomeDevApplicationTests         : Running with Spring Boot v3.1.2, Spring v6.0.11
+2023-08-22T19:21:06.465-04:00  INFO 65517 --- [main] c.s.o.OurHomeDevApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2023-08-22T19:21:10.147-04:00  WARN 65517 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 113c1cd9-fd07-4766-8f0f-d1fa87f768da
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2023-08-22T19:21:10.603-04:00  INFO 65517 --- [main] c.s.o.OurHomeDevApplicationTests         : Started OurHomeDevApplicationTests in 4.879 seconds (process running for 7.194)
