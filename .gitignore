@@ -34,3 +34,4 @@ build/
 
 ### Credentials ###
 src/main/resources/serviceAccountKey.json
+application.credentials
