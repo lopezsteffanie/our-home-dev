@@ -7,10 +7,14 @@ import com.google.firebase.auth.UserRecord;
 import com.steviecodesit.ourhomedev.auth.FirebaseAuthService;
 import com.steviecodesit.ourhomedev.auth.LoginRequest;
 import com.steviecodesit.ourhomedev.auth.RegistrationRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Log4j2
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -27,7 +31,7 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest, HttpServletResponse response) {
         try {
             // Validate input data
             if (registrationRequest.getEmail() == null || registrationRequest.getEmail().isEmpty() ||
@@ -55,14 +59,23 @@ public class UserController {
             // Generate custom token
             String customToken = firebaseAuth.createCustomToken(userRecord.getUid());
 
-            return ResponseEntity.ok("User registered successfully! " + customToken);
+            // Create a new cookie
+            Cookie tokenCookie = new Cookie("customToken", customToken);
+            tokenCookie.setHttpOnly(true);  // This makes the cookie HTTP-only
+            tokenCookie.setSecure(true);  // This makes the cookie secure (works only over HTTPS)
+            tokenCookie.setMaxAge(7 * 24 * 60 * 60); // Sets the cookie's age, e.g., 7 days
+            tokenCookie.setPath("/"); // Sets the path for the cookie
+            response.addCookie(tokenCookie); // Adds the cookie to the response
+
+            return ResponseEntity.ok("User registered successfully!");
         } catch (FirebaseAuthException e) {
+            log.error("Error during registration: ", e);
             return ResponseEntity.internalServerError().body("Registration failed.");
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
             UserRecord userRecord = firebaseAuth.getUserByEmail(loginRequest.getEmail());
 
@@ -77,14 +90,23 @@ public class UserController {
             // Generate custom token
             String customToken = firebaseAuth.createCustomToken(userRecord.getUid());
 
-            return ResponseEntity.ok("User logged in successfully! " + customToken);
+            // Create a new cookie
+            Cookie tokenCookie = new Cookie("customToken", customToken);
+            tokenCookie.setHttpOnly(true);  // This makes the cookie HTTP-only
+            tokenCookie.setSecure(true);  // This makes the cookie secure (works only over HTTPS)
+            tokenCookie.setMaxAge(7 * 24 * 60 * 60); // Sets the cookie's age, e.g., 7 days
+            tokenCookie.setPath("/"); // Sets the path for the cookie
+            response.addCookie(tokenCookie); // Adds the cookie to the response
+
+            return ResponseEntity.ok("User logged in successfully!");
         } catch (FirebaseAuthException e) {
+            log.error("Error during login: ", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String idToken) {
+    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String idToken, HttpServletResponse response) {
         try {
             // Verify and decode the Firebase ID token
             FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
@@ -95,6 +117,14 @@ public class UserController {
 
             return ResponseEntity.ok("User logged out successfully!");
         } catch (Exception e) {
+            // Clear customToken cookie
+            Cookie clearTokenCookie = new Cookie("customToken", null);
+            clearTokenCookie.setMaxAge(0);
+            clearTokenCookie.setHttpOnly(true);
+            clearTokenCookie.setSecure(true);
+            clearTokenCookie.setPath("/");
+            response.addCookie(clearTokenCookie);
+
             return ResponseEntity.internalServerError().body("Logout failed");
         }
     }
