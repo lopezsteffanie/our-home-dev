@@ -51,6 +51,11 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Display name is already taken.");
             }
 
+            // Check if the email is unique
+            if (!userService.isEmailUnique(registrationRequest.getEmail())) {
+                return ResponseEntity.badRequest().body("A user has already registered with that email.");
+            }
+
             UserRecord userRecord = firebaseAuthService.registerUser(registrationRequest.getEmail(), registrationRequest.getPassword(), registrationRequest.getUsername());
 
             // Save userRecord to Firestore
@@ -115,9 +120,7 @@ public class UserController {
             // Update isLoggedIn to false for the logged-out user
             userService.updateIsLoggedInStatus(userId, false);
 
-            return ResponseEntity.ok("User logged out successfully!");
-        } catch (Exception e) {
-            // Clear customToken cookie
+            // Clear the cookie on successful logout
             Cookie clearTokenCookie = new Cookie("customToken", null);
             clearTokenCookie.setMaxAge(0);
             clearTokenCookie.setHttpOnly(true);
@@ -125,6 +128,8 @@ public class UserController {
             clearTokenCookie.setPath("/");
             response.addCookie(clearTokenCookie);
 
+            return ResponseEntity.ok("User logged out successfully!");
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Logout failed");
         }
     }

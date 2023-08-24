@@ -221,6 +221,88 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testIsEmailUnique_EmailIsUnique() {
+        String email = "test@example.com";
+
+        // Mocking Firestore objects
+        CollectionReference usersCollection = mock(CollectionReference.class);
+        Query query = mock(Query.class);
+        QuerySnapshot querySnapshot = mock(QuerySnapshot.class);
+        ApiFuture<QuerySnapshot> futureSnapshot = ApiFutures.immediateFuture(querySnapshot);
+
+        when(firestore.collection("users")).thenReturn(usersCollection);
+        when(usersCollection.whereEqualTo("email", email)).thenReturn(query);
+        when(query.limit(1)).thenReturn(query);
+        when(query.get()).thenReturn(futureSnapshot);
+        when(querySnapshot.isEmpty()).thenReturn(true);
+
+        boolean isUnique = userService.isDisplayNameUnique(email);
+
+        assertTrue(isUnique);
+        verify(usersCollection).whereEqualTo("email", email);
+    }
+
+
+    @Test
+    public void testIsEmailUnique_EmailIsNotUnique() {
+        String email = "test@example.com";
+
+        CollectionReference usersCollection = mock(CollectionReference.class);
+        Query query = mock(Query.class);
+        QuerySnapshot querySnapshot = mock(QuerySnapshot.class);
+        ApiFuture<QuerySnapshot> futureSnapshot = ApiFutures.immediateFuture(querySnapshot);
+
+        when(firestore.collection("users")).thenReturn(usersCollection);
+        when(usersCollection.whereEqualTo("email", email)).thenReturn(query);
+        when(query.limit(1)).thenReturn(query);
+        when(query.get()).thenReturn(futureSnapshot);
+        when(querySnapshot.isEmpty()).thenReturn(false);
+
+        boolean isUnique = userService.isDisplayNameUnique(email);
+
+        assertFalse(isUnique);
+        verify(firestore.collection("users")).whereEqualTo("email", email);
+    }
+
+    @Test
+    public void testIsEmailUnique_InterruptedException() throws Exception {
+        String email = "test@example.com";
+
+        Query query = mock(Query.class);
+        CollectionReference usersCollection = mock(CollectionReference.class);
+        ApiFuture<QuerySnapshot> futureSnapshot = mock(ApiFuture.class);
+        when(firestore.collection("users")).thenReturn(usersCollection);
+        when(usersCollection.whereEqualTo("email", email)).thenReturn(query);
+        when(query.limit(1)).thenReturn(query);
+        when(query.get()).thenReturn(futureSnapshot);
+        when(futureSnapshot.get()).thenThrow(InterruptedException.class);
+
+        boolean isUnique = userService.isDisplayNameUnique(email);
+
+        assertFalse(isUnique);
+        verify(firestore.collection("users")).whereEqualTo("email", email);
+    }
+
+    @Test
+    public void testIsEmailUnique_ExecutionException() throws Exception {
+        String email = "test@example.com";
+
+        Query query = mock(Query.class);
+        CollectionReference usersCollection = mock(CollectionReference.class);
+        ApiFuture<QuerySnapshot> futureSnapshot = mock(ApiFuture.class);
+        when(firestore.collection("users")).thenReturn(usersCollection);
+        when(usersCollection.whereEqualTo("email", email)).thenReturn(query);
+        when(query.limit(1)).thenReturn(query);
+        when(query.get()).thenReturn(futureSnapshot);
+        when(futureSnapshot.get()).thenThrow(ExecutionException.class);
+
+        boolean isUnique = userService.isDisplayNameUnique(email);
+
+        assertFalse(isUnique);
+        verify(firestore.collection("users")).whereEqualTo("email", email);
+    }
+
+    @Test
     public void testIsValidPassword_ValidPassword() {
         assertTrue(userService.isValidPassword("Password1!"));
         assertTrue(userService.isValidPassword("Aa1!Aa1!"));

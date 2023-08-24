@@ -70,6 +70,22 @@ public class UserService {
         }
     }
 
+    public boolean isEmailUnique(String email) {
+        CollectionReference usersCollection = firestore.collection("users");
+
+        try {
+            // Query Firestore to check if any document has the same email
+            Query query = usersCollection.whereEqualTo("email", email).limit(1);
+            QuerySnapshot querySnapshot = query.get().get();
+
+            return querySnapshot.isEmpty(); // Return true if no documents match
+        } catch (InterruptedException | ExecutionException e) {
+            // Log the exception or take appropriate action
+            System.err.println("Exception occurred: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean isValidPassword(String password) {
         // password must contain:
         // at least 8 characters

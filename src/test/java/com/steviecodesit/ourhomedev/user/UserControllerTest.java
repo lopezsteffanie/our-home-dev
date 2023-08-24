@@ -17,8 +17,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -48,6 +47,7 @@ public class UserControllerTest {
         when(userRecord.getUid()).thenReturn("uid123");
         when(userService.isValidPassword(anyString())).thenReturn(true);
         when(userService.isDisplayNameUnique(anyString())).thenReturn(true);
+        when(userService.isEmailUnique(anyString())).thenReturn(true);
         when(firebaseAuthService.registerUser(anyString(), anyString(), anyString())).thenReturn(userRecord);
         when(firebaseAuth.createCustomToken("uid123")).thenReturn("customToken");
 
@@ -119,6 +119,26 @@ public class UserControllerTest {
     }
 
     @Test
+    public void registerUser_EmailNotUnique() {
+        RegistrationRequest request = new RegistrationRequest();
+        request.setEmail("email@example.com");
+        request.setPassword("Password1!");
+        request.setUsername("username");
+
+        when(userService.isValidPassword(anyString())).thenReturn(true);
+        when(userService.isDisplayNameUnique(anyString())).thenReturn(true);
+        when(userService.isEmailUnique(anyString())).thenReturn(false);
+
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        ResponseEntity<String> response = userController.registerUser(request, mockResponse);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("A user has already registered with that email.", response.getBody());
+
+        verifyNoInteractions(mockResponse);
+    }
+
+    @Test
     public void registerUser_InternalServiceError() throws FirebaseAuthException {
         RegistrationRequest request = new RegistrationRequest();
         request.setEmail("email@example.com");
@@ -127,6 +147,7 @@ public class UserControllerTest {
 
         when(userService.isValidPassword(anyString())).thenReturn(true);
         when(userService.isDisplayNameUnique(anyString())).thenReturn(true);
+        when(userService.isEmailUnique(anyString())).thenReturn(true);
         when(firebaseAuthService.registerUser(anyString(), anyString(), anyString())).thenThrow(FirebaseAuthException.class);
 
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
@@ -244,8 +265,8 @@ public class UserControllerTest {
                 .findFirst()
                 .orElse(null);
 
-        assertNotNull(customTokenCookie);
-        assertEquals(0, customTokenCookie.getMaxAge());
+
+        assertNull(customTokenCookie);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Logout failed", response.getBody());
