@@ -1,2 +1,12 @@
-package com.steviecodesit.ourhomedev.user;public class User {
+package com.steviecodesit.ourhomedev.user;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class User {
+    private String email;
+    private String displayName;
+    private boolean isLoggedIn;
 }

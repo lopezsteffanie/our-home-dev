@@ -11,9 +11,4 @@ import javax.validation.constraints.Size;
 public class LoginRequest {
     @Email
     private String email;
-
-    @Size(min = 6)
-    private String password;
-
-    private String displayName;
 }
