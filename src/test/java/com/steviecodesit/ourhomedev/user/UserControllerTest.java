@@ -35,11 +35,12 @@ public class UserControllerTest {
     public void registerUser_Success() throws FirebaseAuthException {
         RegistrationRequest request = new RegistrationRequest();
         request.setEmail("email@example.com");
-        request.setPassword("password123");
+        request.setPassword("Password1!");
         request.setUsername("username");
 
         UserRecord userRecord = mock(UserRecord.class);
         when(userRecord.getUid()).thenReturn("uid123");
+        when(userService.isValidPassword(anyString())).thenReturn(true);
         when(userService.isDisplayNameUnique(anyString())).thenReturn(true);
         when(firebaseAuthService.registerUser(anyString(), anyString(), anyString())).thenReturn(userRecord);
         when(firebaseAuth.createCustomToken("uid123")).thenReturn("customToken");
@@ -51,7 +52,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void registerUser_EmptyRegistration() throws FirebaseAuthException {
+    public void registerUser_EmptyRegistration() {
         RegistrationRequest request = new RegistrationRequest();
 
         ResponseEntity<String> response = userController.registerUser(request);
@@ -61,12 +62,28 @@ public class UserControllerTest {
     }
 
     @Test
-    public void registerUser_DisplayNameNotUnique() throws FirebaseAuthException {
+    public void registerUser_InvalidPassword() {
         RegistrationRequest request = new RegistrationRequest();
         request.setEmail("email@example.com");
         request.setPassword("password123");
         request.setUsername("username");
 
+        when(userService.isValidPassword(anyString())).thenReturn(false);
+
+        ResponseEntity<String> response = userController.registerUser(request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Password must meet the required criteria.", response.getBody());
+    }
+
+    @Test
+    public void registerUser_DisplayNameNotUnique() {
+        RegistrationRequest request = new RegistrationRequest();
+        request.setEmail("email@example.com");
+        request.setPassword("Password1!");
+        request.setUsername("username");
+
+        when(userService.isValidPassword(anyString())).thenReturn(true);
         when(userService.isDisplayNameUnique(anyString())).thenReturn(false);
 
         ResponseEntity<String> response = userController.registerUser(request);
@@ -79,9 +96,10 @@ public class UserControllerTest {
     public void registerUser_InternalServiceError() throws FirebaseAuthException {
         RegistrationRequest request = new RegistrationRequest();
         request.setEmail("email@example.com");
-        request.setPassword("password123");
+        request.setPassword("Password1!");
         request.setUsername("username");
 
+        when(userService.isValidPassword(anyString())).thenReturn(true);
         when(userService.isDisplayNameUnique(anyString())).thenReturn(true);
         when(firebaseAuthService.registerUser(anyString(), anyString(), anyString())).thenThrow(FirebaseAuthException.class);
 

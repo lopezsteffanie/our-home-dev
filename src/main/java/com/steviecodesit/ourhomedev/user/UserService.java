@@ -69,4 +69,14 @@ public class UserService {
             return false;
         }
     }
+
+    public boolean isValidPassword(String password) {
+        // password must contain:
+        // at least 8 characters
+        // at least one number
+        // at least one lowercase letter
+        // at least one uppercase letter, at least one special character
+        return (password.length() >= 8) && (password.matches(".*\\d.*")) && (password.matches(".*[a-z].*"))
+                && (password.matches(".*[A-Z].*")) && (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>/?].*"));
+    }
 }

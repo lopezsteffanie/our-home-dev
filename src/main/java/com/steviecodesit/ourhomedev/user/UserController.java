@@ -36,6 +36,12 @@ public class UserController {
                 return ResponseEntity.badRequest().body("Email, password, and userName are required.");
             }
 
+            // Check if password is valid
+            String password = registrationRequest.getPassword();
+            if (password == null || !userService.isValidPassword(password)) {
+                return ResponseEntity.badRequest().body("Password must meet the required criteria.");
+            }
+
             // Check if the display name is unique
             if (!userService.isDisplayNameUnique(registrationRequest.getUsername())) {
                 return ResponseEntity.badRequest().body("Display name is already taken.");
@@ -51,7 +57,7 @@ public class UserController {
 
             return ResponseEntity.ok("User registered successfully! " + customToken);
         } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed.");
+            return ResponseEntity.internalServerError().body("Registration failed.");
         }
     }
 
@@ -62,7 +68,7 @@ public class UserController {
 
             // Check if the user is already logged in
             if (userService.isUserLoggedIn(userRecord.getUid())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is already logged in.");
+                return ResponseEntity.badRequest().body("User is already logged in.");
             }
 
             // Update isLoggedIn to true for the logged-in user
@@ -89,7 +95,7 @@ public class UserController {
 
             return ResponseEntity.ok("User logged out successfully!");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Logout failed");
+            return ResponseEntity.internalServerError().body("Logout failed");
         }
     }
 }

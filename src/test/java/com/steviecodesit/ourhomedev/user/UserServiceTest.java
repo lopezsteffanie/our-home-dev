@@ -60,7 +60,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testIsUserLoggedIn_UserExistsAndIsLoggedIn() throws Exception {
+    public void testIsUserLoggedIn_UserExistsAndIsLoggedIn() {
         String userId = "userId";
         User user = new User();
         user.setLoggedIn(true);
@@ -78,7 +78,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testIsUserLoggedIn_UserExistsAndIsNotLoggedIn() throws Exception {
+    public void testIsUserLoggedIn_UserExistsAndIsNotLoggedIn() {
         String userId = "userId";
         User user = new User();
         user.setLoggedIn(false);
@@ -96,7 +96,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testIsUserLoggedIn_UserDoesNotExist() throws Exception {
+    public void testIsUserLoggedIn_UserDoesNotExist() {
         String userId = "userId";
 
         DocumentSnapshot documentSnapshot = mock(DocumentSnapshot.class);
@@ -111,7 +111,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testIsUserLoggedIn_InterruptedException() throws Exception {
+    public void testIsUserLoggedIn_InterruptedException() throws Exception {
         String userId = "userId";
 
         ApiFuture<DocumentSnapshot> futureSnapshot = mock(ApiFuture.class);
@@ -125,7 +125,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testIsUserLoggedIn_ExecutionException() throws Exception {
+    public void testIsUserLoggedIn_ExecutionException() throws Exception {
         String userId = "userId";
 
         ApiFuture<DocumentSnapshot> futureSnapshot = mock(ApiFuture.class);
@@ -139,7 +139,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testIsDisplayNameUnique_DisplayNameIsUnique() throws Exception {
+    public void testIsDisplayNameUnique_DisplayNameIsUnique() {
         String displayName = "UniqueName";
 
         // Mocking Firestore objects
@@ -162,7 +162,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void testIsDisplayNameUnique_DisplayNameIsNotUnique() throws Exception {
+    public void testIsDisplayNameUnique_DisplayNameIsNotUnique() {
         String displayName = "DuplicateName";
 
         CollectionReference usersCollection = mock(CollectionReference.class);
@@ -183,7 +183,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testIsDisplayNameUnique_InterruptedException() throws Exception {
+    public void testIsDisplayNameUnique_InterruptedException() throws Exception {
         String displayName = "UniqueName";
 
         Query query = mock(Query.class);
@@ -202,7 +202,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testIsDisplayNameUnique_ExecutionException() throws Exception {
+    public void testIsDisplayNameUnique_ExecutionException() throws Exception {
         String displayName = "UniqueName";
 
         Query query = mock(Query.class);
@@ -220,4 +220,35 @@ public class UserServiceTest {
         verify(firestore.collection("users")).whereEqualTo("displayName", displayName);
     }
 
+    @Test
+    public void testIsValidPassword_ValidPassword() {
+        assertTrue(userService.isValidPassword("Password1!"));
+        assertTrue(userService.isValidPassword("Aa1!Aa1!"));
+        assertTrue(userService.isValidPassword("Xy$456Zz"));
+    }
+
+    @Test
+    public void testIsValidPassword_InvalidPasswordNoDigit() {
+        assertFalse(userService.isValidPassword("Password!"));
+    }
+
+    @Test
+    public void testIsValidPassword_InvalidPasswordNoLowercase() {
+        assertFalse(userService.isValidPassword("PASSWORD1!"));
+    }
+
+    @Test
+    public void testIsValidPassword_InvalidPasswordNoUppdercase() {
+        assertFalse(userService.isValidPassword("password1!"));
+    }
+
+    @Test
+    public void testIsValidPassword_InvalidPasswordNoSpecialCharacter() {
+        assertFalse(userService.isValidPassword("Password1"));
+    }
+
+    @Test
+    public void testIsValidPassword_InvalidPasswordTooShort() {
+        assertFalse(userService.isValidPassword("P1a!"));
+    }
 }
