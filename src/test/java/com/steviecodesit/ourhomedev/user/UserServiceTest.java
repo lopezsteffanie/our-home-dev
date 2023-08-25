@@ -236,7 +236,7 @@ public class UserServiceTest {
         when(query.get()).thenReturn(futureSnapshot);
         when(querySnapshot.isEmpty()).thenReturn(true);
 
-        boolean isUnique = userService.isDisplayNameUnique(email);
+        boolean isUnique = userService.isEmailUnique(email);
 
         assertTrue(isUnique);
         verify(usersCollection).whereEqualTo("email", email);
@@ -258,7 +258,7 @@ public class UserServiceTest {
         when(query.get()).thenReturn(futureSnapshot);
         when(querySnapshot.isEmpty()).thenReturn(false);
 
-        boolean isUnique = userService.isDisplayNameUnique(email);
+        boolean isUnique = userService.isEmailUnique(email);
 
         assertFalse(isUnique);
         verify(firestore.collection("users")).whereEqualTo("email", email);
@@ -277,7 +277,7 @@ public class UserServiceTest {
         when(query.get()).thenReturn(futureSnapshot);
         when(futureSnapshot.get()).thenThrow(InterruptedException.class);
 
-        boolean isUnique = userService.isDisplayNameUnique(email);
+        boolean isUnique = userService.isEmailUnique(email);
 
         assertFalse(isUnique);
         verify(firestore.collection("users")).whereEqualTo("email", email);
@@ -296,7 +296,7 @@ public class UserServiceTest {
         when(query.get()).thenReturn(futureSnapshot);
         when(futureSnapshot.get()).thenThrow(ExecutionException.class);
 
-        boolean isUnique = userService.isDisplayNameUnique(email);
+        boolean isUnique = userService.isEmailUnique(email);
 
         assertFalse(isUnique);
         verify(firestore.collection("users")).whereEqualTo("email", email);
