@@ -39,7 +39,7 @@ public class FirebaseAuthServiceTest {
 
         // Verify interactions with mock objects
         verify(firebaseAuth).createUser(any(UserRecord.CreateRequest.class));
-        verify(userService).saveUser(userRecord, displayName);
+        verify(userService).saveUser(userRecord);
 
         // Assert the result
         assertEquals(userRecord, returnedUserRecord);

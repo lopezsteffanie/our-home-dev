@@ -39,12 +39,12 @@ public class UserServiceTest {
     @Test
     public void testSaveUser() {
         UserRecord userRecord = mock(UserRecord.class);
-        String displayName = "Test User";
 
         when(userRecord.getEmail()).thenReturn("test@example.com");
         when(userRecord.getUid()).thenReturn("uid");
+        when(userRecord.getDisplayName()).thenReturn("Test User");
 
-        userService.saveUser(userRecord, displayName);
+        userService.saveUser(userRecord);
 
         verify(usersCollection).document(userRecord.getUid());
         verify(userDocument).set(any(User.class));

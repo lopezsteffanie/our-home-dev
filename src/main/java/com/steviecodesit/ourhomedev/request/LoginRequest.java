@@ -1,4 +1,4 @@
-package com.steviecodesit.ourhomedev.auth;
+package com.steviecodesit.ourhomedev.request;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -31,7 +31,7 @@ public class FirebaseAuthService {
                 .setDisplayName(displayName);
 
         UserRecord userRecord = firebaseAuth.createUser(request);
-        userService.saveUser(userRecord, displayName);
+        userService.saveUser(userRecord);
 
         return userRecord;
     }

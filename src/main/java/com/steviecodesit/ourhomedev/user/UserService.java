@@ -15,12 +15,13 @@ public class UserService {
         this.firestore = firestore;
     }
 
-    public void saveUser(UserRecord userRecord, String displayName) {
+    public void saveUser(UserRecord userRecord) {
         // Map UserRecord data to your User model
         User user = new User();
         user.setEmail(userRecord.getEmail());
-        user.setDisplayName(displayName);
+        user.setDisplayName(user.getDisplayName());
         user.setLoggedIn(true);
+        user.setHouseholdId(null);
 
         // Save the user to Firestore
         CollectionReference usersCollection = firestore.collection("users");

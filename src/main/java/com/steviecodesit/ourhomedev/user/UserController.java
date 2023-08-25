@@ -5,8 +5,8 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.steviecodesit.ourhomedev.auth.FirebaseAuthService;
-import com.steviecodesit.ourhomedev.auth.LoginRequest;
-import com.steviecodesit.ourhomedev.auth.RegistrationRequest;
+import com.steviecodesit.ourhomedev.request.LoginRequest;
+import com.steviecodesit.ourhomedev.request.RegistrationRequest;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -59,7 +59,7 @@ public class UserController {
             UserRecord userRecord = firebaseAuthService.registerUser(registrationRequest.getEmail(), registrationRequest.getPassword(), registrationRequest.getUsername());
 
             // Save userRecord to Firestore
-            userService.saveUser(userRecord, registrationRequest.getUsername());
+            userService.saveUser(userRecord);
 
             // Generate custom token
             String customToken = firebaseAuth.createCustomToken(userRecord.getUid());
