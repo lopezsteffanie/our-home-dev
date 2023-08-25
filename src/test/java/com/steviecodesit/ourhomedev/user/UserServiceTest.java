@@ -3,6 +3,7 @@ package com.steviecodesit.ourhomedev.user;
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.*;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ public class UserServiceTest {
 
     private UserService userService;
     private Firestore firestore;
+    private FirebaseAuth firebaseAuth;
     private CollectionReference usersCollection;
     private DocumentReference userDocument;
     private Query query;
@@ -25,6 +27,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         firestore = mock(Firestore.class);
+        firebaseAuth = mock(FirebaseAuth.class);
         usersCollection = mock(CollectionReference.class);
         userDocument = mock(DocumentReference.class);
         query = mock(Query.class);
@@ -33,7 +36,7 @@ public class UserServiceTest {
         when(usersCollection.document(anyString())).thenReturn(userDocument);
         when(usersCollection.whereEqualTo(anyString(), anyString())).thenReturn(query);
 
-        userService = new UserService(firestore);
+        userService = new UserService(firestore, firebaseAuth);
     }
 
     @Test

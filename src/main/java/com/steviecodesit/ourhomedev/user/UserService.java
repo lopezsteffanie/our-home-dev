@@ -1,18 +1,28 @@
 package com.steviecodesit.ourhomedev.user;
 
 import com.google.cloud.firestore.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import com.steviecodesit.ourhomedev.household.HouseholdMembership;
+import com.steviecodesit.ourhomedev.household.HouseholdMembershipStatus;
+import com.steviecodesit.ourhomedev.household.HouseholdRole;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
 
     private final Firestore firestore;
+    private final FirebaseAuth firebaseAuth;
 
-    public UserService(Firestore firestore) {
+    public UserService(Firestore firestore, FirebaseAuth firebaseAuth) {
         this.firestore = firestore;
+        this.firebaseAuth = firebaseAuth;
     }
 
     public void saveUser(UserRecord userRecord) {
@@ -21,7 +31,7 @@ public class UserService {
         user.setEmail(userRecord.getEmail());
         user.setDisplayName(user.getDisplayName());
         user.setLoggedIn(true);
-        user.setHouseholdId(null);
+        user.setHouseholdMembership(null);
 
         // Save the user to Firestore
         CollectionReference usersCollection = firestore.collection("users");
@@ -95,5 +105,68 @@ public class UserService {
         // at least one uppercase letter, at least one special character
         return (password.length() >= 8) && (password.matches(".*\\d.*")) && (password.matches(".*[a-z].*"))
                 && (password.matches(".*[A-Z].*")) && (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>/?].*"));
+    }
+
+    public List<User> findUserByEmailOrUsername(String query) {
+        CollectionReference usersCollection = firestore.collection("users");
+        List<User> matchingUsers = new ArrayList<>();
+
+        // Find users by email
+        Query emailQuery = usersCollection.whereEqualTo("email", query);
+        try {
+            QuerySnapshot emailSnapshot = emailQuery.get().get();
+            for (DocumentSnapshot document : emailSnapshot.getDocuments()) {
+                matchingUsers.add(document.toObject(User.class));
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            // Handle exceptions
+        }
+
+        // Find users by username (avoid duplicates if any user matches both email and username)
+        Query usernameQuery = usersCollection.whereEqualTo("displayName", query);
+        try {
+            QuerySnapshot usernameSnapshot = usernameQuery.get().get();
+            for (DocumentSnapshot document : usernameSnapshot.getDocuments()) {
+                User user = document.toObject(User.class);
+                if (!matchingUsers.contains(user)) {
+                    matchingUsers.add(user);
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            // Handle exceptions
+        }
+
+        return matchingUsers;
+    }
+
+    public void addMembershipToUser(String userId, String householdId, HouseholdRole role, HouseholdMembershipStatus status) throws Exception {
+        DocumentReference userRef = firestore.collection("users").document(userId);
+        User user = userRef.get().get().toObject(User.class);
+
+        if (user != null) {
+            HouseholdMembership membership = user.getHouseholdMembership();
+            membership.setHouseholdId(householdId);
+            membership.setUserId(userId);
+            membership.setHouseholdRole(role);
+            membership.setMemberStatus(status);
+
+            userRef.set(user);
+        }
+    }
+
+    public void removeMembershipFromUser(String userId, String householdId) throws Exception {
+        DocumentReference userRef = firestore.collection("users").document(userId);
+        User user = userRef.get().get().toObject(User.class);
+
+        if (user.getHouseholdMembership() != null && user.getHouseholdMembership().getHouseholdId().equals(householdId)) {
+            user.setHouseholdMembership(null);
+        }
+
+        userRef.set(user);
+    }
+
+    public String verifyTokenAndGetUserId(String userIdToken) throws FirebaseAuthException {
+        FirebaseToken decodedToken = firebaseAuth.verifyIdToken(userIdToken);
+        return decodedToken.getUid();
     }
 }
