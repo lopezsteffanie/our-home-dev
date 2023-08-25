@@ -76,7 +76,7 @@ public class HouseholdController {
             String userId = userService.verifyTokenAndGetUserId(userIdToken);
 
             // Update the household's member list
-            householdService.acceptMembership(householdId, userId);
+            householdService.acceptOrDeclineMembership(householdId, userId, HouseholdMembershipStatus.ACCEPTED);
 
             // Update the user's document with the new membership info
             userService.addMembershipToUser(userId, householdId, HouseholdRole.MEMBER, HouseholdMembershipStatus.ACCEPTED);
@@ -92,7 +92,7 @@ public class HouseholdController {
         try {
             String userId = userService.verifyTokenAndGetUserId(userIdToken);
 
-            householdService.declineMembership(householdId, userId);
+            householdService.acceptOrDeclineMembership(householdId, userId, HouseholdMembershipStatus.DECLINED);
 
             userService.removeMembershipFromUser(userId, householdId);
 
@@ -102,7 +102,7 @@ public class HouseholdController {
         }
     }
 
-    @PostMapping("/{householdId}/cancel-incite/{userId}")
+    @PostMapping("/{householdId}/cancel-invite/{userId}")
     public ResponseEntity<String> cancelInvitation(@PathVariable String householdId, @PathVariable String userId) {
         try {
             householdService.cancelInvitation(householdId, userId);
@@ -112,7 +112,7 @@ public class HouseholdController {
         }
     }
 
-    @PostMapping("/requestHoin/{targetUserId}")
+    @PostMapping("/request-join/{targetUserId}")
     public ResponseEntity<String> requestJoinHousehold(@RequestHeader("Authorization") String requestUserIdToken, @PathVariable String targetUserId) throws FirebaseAuthException {
         String requesterUserId = userService.verifyTokenAndGetUserId(requestUserIdToken);
 
@@ -128,7 +128,7 @@ public class HouseholdController {
     public ResponseEntity<String> acceptUserToHousehold(@PathVariable String userIdToAccept, @RequestBody String householdId, @RequestHeader("Authorization") String ownerIdToken) throws FirebaseAuthException {
         String ownerId = userService.verifyTokenAndGetUserId(ownerIdToken);
         try {
-            householdService.acceptUserToHousehold(userIdToAccept, householdId, ownerId);
+            householdService.acceptOrRejectUserToHousehold(userIdToAccept, householdId, ownerId, HouseholdMembershipStatus.ACCEPTED);
             return ResponseEntity.ok("User successfully added to the household.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to add user to the household.");
@@ -139,7 +139,7 @@ public class HouseholdController {
     public ResponseEntity<String> denyUserFromHousehold(@PathVariable String userIdToDeny, @RequestBody String householdId, @RequestHeader("Authorization") String ownerIdToken) throws FirebaseAuthException {
         String ownerId = userService.verifyTokenAndGetUserId(ownerIdToken);
         try {
-            householdService.denyUserFromHousehold(userIdToDeny, householdId, ownerId);
+            householdService.acceptOrRejectUserToHousehold(userIdToDeny, householdId, ownerId, HouseholdMembershipStatus.DECLINED);
             return ResponseEntity.ok("User's request denied successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to deny user's request.");

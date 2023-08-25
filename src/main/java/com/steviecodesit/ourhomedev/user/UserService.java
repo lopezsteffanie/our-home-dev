@@ -27,23 +27,19 @@ public class UserService {
 
     public void saveUser(UserRecord userRecord) {
         // Map UserRecord data to your User model
-        User user = new User();
-        user.setEmail(userRecord.getEmail());
-        user.setDisplayName(user.getDisplayName());
-        user.setLoggedIn(true);
-        user.setHouseholdMembership(null);
+        User user = User.builder()
+                .email(userRecord.getEmail())
+                .displayName(userRecord.getDisplayName())
+                .isLoggedIn(true)
+                .householdMembership(null)
+                .build();
 
         // Save the user to Firestore
-        CollectionReference usersCollection = firestore.collection("users");
-        DocumentReference userDocument = usersCollection.document(userRecord.getUid());
-
-        // Use the Firestore API to set the user data in the document
-        userDocument.set(user);
+        firestore.collection("users").document(userRecord.getUid()).set(user);
     }
 
     public void updateIsLoggedInStatus(String userId, boolean isLoggedIn) {
-        DocumentReference userDocument = firestore.collection("users").document(userId);
-        userDocument.update("loggedIn", isLoggedIn);
+        firestore.collection("users").document(userId).update("loggedIn", isLoggedIn);
     }
 
     public boolean isUserLoggedIn(String userId) {
@@ -140,33 +136,43 @@ public class UserService {
     }
 
     public void addMembershipToUser(String userId, String householdId, HouseholdRole role, HouseholdMembershipStatus status) throws Exception {
-        DocumentReference userRef = firestore.collection("users").document(userId);
-        User user = userRef.get().get().toObject(User.class);
-
+        User user = getUserById(userId);
         if (user != null) {
-            HouseholdMembership membership = user.getHouseholdMembership();
-            membership.setHouseholdId(householdId);
-            membership.setUserId(userId);
-            membership.setHouseholdRole(role);
-            membership.setMemberStatus(status);
+            HouseholdMembership membership = HouseholdMembership.builder()
+                    .householdId(householdId)
+                    .userId(userId)
+                    .householdRole(role)
+                    .memberStatus(status)
+                    .build();
 
-            userRef.set(user);
+            user.setHouseholdMembership(membership);
+            firestore.collection("users").document(userId).set(user);
         }
     }
 
     public void removeMembershipFromUser(String userId, String householdId) throws Exception {
-        DocumentReference userRef = firestore.collection("users").document(userId);
-        User user = userRef.get().get().toObject(User.class);
+        User user = getUserById(userId);
 
         if (user.getHouseholdMembership() != null && user.getHouseholdMembership().getHouseholdId().equals(householdId)) {
             user.setHouseholdMembership(null);
         }
 
-        userRef.set(user);
+        firestore.collection("users").document(userId).set(user);
     }
 
     public String verifyTokenAndGetUserId(String userIdToken) throws FirebaseAuthException {
         FirebaseToken decodedToken = firebaseAuth.verifyIdToken(userIdToken);
         return decodedToken.getUid();
+    }
+
+    public User getUserById(String userId) throws Exception {
+        DocumentReference docRef = firestore.collection("users").document(userId);
+        DocumentSnapshot documentSnapshot = docRef.get().get();
+
+        if (documentSnapshot.exists()) {
+            return documentSnapshot.toObject(User.class);
+        } else {
+            throw new Exception("User not found");
+        }
     }
 }

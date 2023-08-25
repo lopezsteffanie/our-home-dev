@@ -65,8 +65,9 @@ public class UserServiceTest {
     @Test
     public void testIsUserLoggedIn_UserExistsAndIsLoggedIn() {
         String userId = "userId";
-        User user = new User();
-        user.setLoggedIn(true);
+        User user = User.builder()
+                .isLoggedIn(true)
+                .build();
 
         DocumentSnapshot documentSnapshot = mock(DocumentSnapshot.class);
         ApiFuture<DocumentSnapshot> futureSnapshot = ApiFutures.immediateFuture(documentSnapshot);
@@ -83,8 +84,9 @@ public class UserServiceTest {
     @Test
     public void testIsUserLoggedIn_UserExistsAndIsNotLoggedIn() {
         String userId = "userId";
-        User user = new User();
-        user.setLoggedIn(false);
+        User user = User.builder()
+                .isLoggedIn(false)
+                .build();
 
         DocumentSnapshot documentSnapshot = mock(DocumentSnapshot.class);
         ApiFuture<DocumentSnapshot> futureSnapshot = ApiFutures.immediateFuture(documentSnapshot);
